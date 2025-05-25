@@ -1,150 +1,183 @@
-// IMPORTANT: Ensure this file is saved with UTF-8 encoding.
-"use client"; // If using in Next.js App Router context
+"use client";
 
-import React, { useState, useEffect } from 'react';
-// import { useRouter } from 'next/navigation'; // Uncomment if using Next.js navigation
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Home, QrCode, Pencil } from "lucide-react";
+import { motion } from "framer-motion";
+import "./styles.css"; // Add necessary CSS for 3D effect
 
-// Tailwind CSSがプロジェクトに設定されていることを前提とします。
-
-const secretQuestionsData = [
-    {
-        id: 1,
-        question: "好きな食べ物は？",
-        answer: "ポテト" // 回答は実際のものに置き換えてください
-    },
-    {
-        id: 2,
-        question: "ペットの名前は？",
-        answer: "ポチ" // 回答は実際のものに置き換えてください
-    },
-    {
-        id: 3,
-        question: "卒業した小学校の名前は？",
-        answer: "さくら小学校" // 回答は実際のものに置き換えてください
-    },
-    {
-        id: 4,
-        question: "好きな映画のタイトルは？",
-        answer: "ショーシャンクの空に" // 回答は実際のものに置き換えてください
-    }
+const departments = [
+  {
+    name: "部門A",
+    progress: 25, // 部門Aの進捗
+    teams: [
+      {
+        name: "部署A1",
+        progress: 50, // 部署A1の進捗
+        employees: [
+          { name: "山田太郎", date: "2024/04/01", image: "/users/user_a.png", style: "gold" },
+          { name: "佐藤小太郎", date: "2024/04/05", image: "/users/user_b.png", style: "blue" },
+        ],
+      },
+      {
+        name: "部署A2",
+        progress: 0, // 部署A2の進捗
+        employees: [
+          { name: "小林洋一", date: "2024/04/10", image: "/users/user_c.png", style: "blue" },
+          { name: "田中花子", date: "2024/04/15", image: "/users/user_d.png", style: "blue" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "部門B",
+    progress: 0, // 部門Bの進捗
+    teams: [
+      {
+        name: "部署B1",
+        progress: 0, // 部署B1の進捗
+        employees: [
+          { name: "森本一之介", date: "2024/05/01", image: "/users/user_e.png", style: "blue" },
+        ],
+      },
+    ],
+  },
 ];
 
-// 次のページへの遷移先URL (Next.jsの場合は useRouter を使用)
-const SUCCESS_PAGE_URL = '/success'; // 例: '/thank-you' や '/dashboard' など
-
-function SecretQuestionPage() { // Renamed from App to be more specific
-    // const router = useRouter(); // Uncomment if using Next.js navigation
-    const [selectedQuestionId, setSelectedQuestionId] = useState('');
-    const [answer, setAnswer] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-
-    // コンポーネントマウント時に最初の質問を選択状態にする
-    useEffect(() => {
-        if (secretQuestionsData.length > 0) {
-            setSelectedQuestionId(secretQuestionsData[0].id.toString());
-        }
-    }, []);
-
-    const handleQuestionChange = (event) => {
-        setSelectedQuestionId(event.target.value);
-        setErrorMessage(''); // 質問を変更したらエラーメッセージをクリア
-    };
-
-    const handleAnswerChange = (event) => {
-        setAnswer(event.target.value);
-        setErrorMessage(''); // 回答を変更したらエラーメッセージをクリア
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        setErrorMessage('');
-
-        if (!answer.trim()) {
-            setErrorMessage('回答を入力してください。');
-            return;
-        }
-
-        const selectedSecret = secretQuestionsData.find(
-            (item) => item.id.toString() === selectedQuestionId
-        );
-
-        if (selectedSecret) {
-            if (answer.trim().toLowerCase() === selectedSecret.answer.toLowerCase()) { // Case-insensitive comparison
-                alert('認証に成功しました。\n次のページに遷移します。');
-                // Next.js navigation:
-                // router.push(SUCCESS_PAGE_URL);
-                // Standard browser navigation:
-                window.location.href = SUCCESS_PAGE_URL;
-            } else {
-                setErrorMessage('質問または回答が一致しません。');
-            }
-        } else {
-            setErrorMessage('選択された質問が見つかりません。システム管理者に連絡してください。');
-        }
-    };
-
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-black p-4 font-['Inter',_sans-serif] text-gray-100">
-            <div className="bg-gray-800 bg-opacity-80 backdrop-filter backdrop-blur-md p-8 rounded-lg shadow-2xl w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center text-white">山本さんのおめでとう ありがとうページ！</h1>
-                <p className="text-sm text-gray-300 mb-6 text-center">
-                    おめでとうの確認のため、設定された質問の回答を入力してください。
-                </p>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-5">
-                        <label htmlFor="questionSelect" className="block mb-2 font-semibold text-gray-200">
-                            質問を選択してください:
-                        </label>
-                        <select
-                            id="questionSelect"
-                            name="question"
-                            value={selectedQuestionId}
-                            onChange={handleQuestionChange}
-                            className="w-full p-3 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                        >
-                            {secretQuestionsData.map((item) => (
-                                <option key={item.id} value={item.id.toString()} className="bg-gray-700 text-gray-100">
-                                    {item.question}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="mb-6">
-                        <label htmlFor="answerInput" className="block mb-2 font-semibold text-gray-200">
-                            回答:
-                        </label>
-                        <input
-                            type="text" // Consider type="password" if the answer should be masked
-                            id="answerInput"
-                            name="answer"
-                            value={answer}
-                            onChange={handleAnswerChange}
-                            className="w-full p-3 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder="回答を入力"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="w-full py-3 px-4 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                    >
-                        次へ
-                    </button>
-                </form>
-
-                {errorMessage && (
-                    <div className="mt-5 p-3 bg-red-700 bg-opacity-50 border border-red-500 text-red-200 rounded-md text-center">
-                        {errorMessage}
-                    </div>
-                )}
-            </div>
-             <footer className="absolute bottom-4 text-center w-full text-sm text-gray-400 text-opacity-80">
-                <p>&copy; {new Date().getFullYear()} あなたのアプリ名. All rights reserved.</p>
-            </footer>
-        </div>
-    );
+function ProgressBar({ percent }) {
+  return (
+    <div className="w-full bg-gray-700 rounded-full h-2 mt-1">
+      <div
+        className="bg-green-500 h-2 rounded-full"
+        style={{ width: `${percent}%` }}
+      ></div>
+    </div>
+  );
 }
 
-export default SecretQuestionPage; // Changed from App
+function RotatingMedal({ front, back, style }) {
+    const [flipped, setFlipped] = useState(false);
+  
+    const handleFlip = () => {
+      setFlipped(!flipped);
+    };
+  
+    const baseClass =
+      "absolute w-full h-full rounded-full border-4 flex items-center justify-center shadow-md overflow-hidden [backface-visibility:hidden]";
+  
+    const frontClass =
+      style === "gold"
+        ? `${baseClass} border-yellow-500 bg-yellow-600`
+        : `${baseClass} border-blue-500 bg-blue-600`;
+  
+    const backClass =
+      style === "gold"
+        ? `${baseClass} rotate-y-180 border-yellow-500 bg-yellow-700 text-white text-sm`
+        : `${baseClass} rotate-y-180 border-blue-500 bg-blue-700 text-white text-sm`;
+  
+    return (
+      <div className="w-12 h-12 mr-2" onClick={handleFlip}>
+        <motion.div
+          className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${
+            flipped ? "rotate-y-180" : ""
+          }`}
+        >
+          <div className={frontClass}>
+            <img
+              src={front}
+              alt="medal front"
+              className="object-cover w-full h-full rounded-full"
+            />
+          </div>
+          <div className={backClass}>{back}</div>
+        </motion.div>
+      </div>
+    );
+  }
+  
+
+export default function CollectionPage() {
+  const [openDept, setOpenDept] = useState(null);
+  const [openTeam, setOpenTeam] = useState(null);
+  const router = useRouter();
+
+  return (
+    <div className="min-h-screen pb-20 bg-gray-900 text-white p-4">
+      <h1 className="text-xl font-bold mb-4">社員図鑑</h1>
+      {departments.map((dept, deptIdx) => (
+        <div key={deptIdx} className="mb-4">
+          <div
+            onClick={() =>
+              setOpenDept(openDept === deptIdx ? null : deptIdx)
+            }
+            className="bg-gray-800 p-3 rounded-lg shadow mb-1 cursor-pointer"
+          >
+            <div className="font-semibold">{dept.name}</div>
+            <ProgressBar percent={dept.progress} />
+            <div className="text-xs mt-1">進捗 {dept.progress}%</div>
+          </div>
+
+          {openDept === deptIdx &&
+            dept.teams.map((team, teamIdx) => (
+              <div key={teamIdx} className="ml-4 mb-2">
+                <div
+                  onClick={() =>
+                    setOpenTeam(openTeam === `${deptIdx}-${teamIdx}`
+                      ? null
+                      : `${deptIdx}-${teamIdx}`)
+                  }
+                  className="bg-gray-700 p-3 rounded-lg shadow cursor-pointer"
+                >
+                  <div className="font-medium">{team.name}</div>
+                  <ProgressBar percent={team.progress} />
+                  <div className="text-xs mt-1">進捗 {team.progress}%</div>
+                </div>
+
+                {openTeam === `${deptIdx}-${teamIdx}` && (
+                  <div className="ml-4 mt-2 space-y-2">
+                    {team.employees.map((emp, empIdx) => (
+                      <div
+                        key={empIdx}
+                        className="flex items-center bg-gray-800 p-2 rounded-lg shadow cursor-pointer"
+                      >
+                        <RotatingMedal
+                          front={emp.image}
+                          back={emp.date}
+                          style={emp.style}
+                        />
+                        <div className="ml-2 text-sm font-medium" onClick={() => router.push(`/profile/${emp.name}`)}>
+                          {emp.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+        </div>
+      ))}
+
+      {/* メニューバー */}
+      <div className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 text-white shadow-md flex justify-around items-center">
+        <button
+          className="flex flex-col items-center text-xs"
+          onClick={() => router.push("/home")}
+        >
+          <Home size={20} />ホーム
+        </button>
+        <button
+          className="flex flex-col items-center text-xs"
+          onClick={() => router.push("/qr")}
+        >
+          <QrCode size={20} />QR読み取り
+        </button>
+        <button
+          className="flex flex-col items-center text-xs"
+          onClick={() => router.push("/edit")}
+        >
+          <Pencil size={20} />プロフィール編集
+        </button>
+      </div>
+    </div>
+  );
+}
